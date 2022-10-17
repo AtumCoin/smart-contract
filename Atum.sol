@@ -1,26 +1,7 @@
-//Name: AtumToken
-//Ticker: ATUM
-//Decimals: 18
-//Website: https://atumtoken.com
-//Email: office@atumtoken.com
-//Chain: Binance Smart Chain
-//Total supply: 192.000.000 ATUM
-//10% Supply is burned at start.
-
-/*
-
-   #ATUM features:
-   3% fee auto add to the liquidity pool to locked forever when selling
-   2% fee auto distribute to all holders
-   I created a black hole so #Bee token will deflate itself in supply with every transaction
-
-   "#LIQ+#RFI+#SHIB+#DOGE = #BEE"
-   
-
- */
-
 pragma solidity ^0.6.12;
-// SPDX-License-Identifier: Unlicensed
+// SPDX-License-Identifier: MIT
+// Name: AtumToken
+// Website: https://atumtoken.com
 interface IERC20 {
 
     function totalSupply() external view returns (uint256);
@@ -412,20 +393,12 @@ library Address {
  * the owner.
  */
 contract Ownable is Context {
-    address private _owner;
+    address public _owner;
     address private _previousOwner;
     uint256 private _lockTime;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
-    /**
-     * @dev Initializes the contract setting the deployer as the initial owner.
-     */
-    constructor () internal {
-        address msgSender = _msgSender();
-        _owner = msgSender;
-        emit OwnershipTransferred(address(0), msgSender);
-    }
 
     /**
      * @dev Returns the address of the current owner.
@@ -698,10 +671,8 @@ interface IUniswapV2Router02 is IUniswapV2Router01 {
     ) external;
 }
 
-//Contact us office@atumtoken.com
-//Website: https://atumtoken.com
-//Chain: Binance Smart Chain
-contract AtumToken is Context, IERC20, Ownable {
+
+contract Atum is Context, IERC20, Ownable {
     using SafeMath for uint256;
     using Address for address;
 
@@ -715,19 +686,19 @@ contract AtumToken is Context, IERC20, Ownable {
     address[] private _excluded;
    
     uint256 private constant MAX = ~uint256(0);
-    uint256 private _tTotal = 192000000 * 10**18;
-    uint256 private _rTotal = (MAX - (MAX % _tTotal));
+    uint256 private _tTotal;
+    uint256 private _rTotal;
     uint256 private _tFeeTotal;
 
-    string private _name = "AtumToken";
-    string private _symbol = "ATUM";
-    uint8 private _decimals = 18;
+    string private _name;
+    string private _symbol;
+    uint256 private _decimals;
     
-    uint256 public _taxFee = 2;
-    uint256 private _previousTaxFee = _taxFee;
+    uint256 public _taxFee;
+    uint256 private _previousTaxFee;
     
-    uint256 public _liquidityFee = 3;
-    uint256 private _previousLiquidityFee = _liquidityFee;
+    uint256 public _liquidityFee;
+    uint256 private _previousLiquidityFee;
 
     IUniswapV2Router02 public immutable uniswapV2Router;
     address public immutable uniswapV2Pair;
@@ -735,8 +706,8 @@ contract AtumToken is Context, IERC20, Ownable {
     bool inSwapAndLiquify;
     bool public swapAndLiquifyEnabled = true;
     
-    uint256 public _maxTxAmount = 5000 * 10**18;
-    uint256 private numTokensSellToAddToLiquidity = 500 * 10**18;
+    uint256 public _maxTxAmount;
+    uint256 public numTokensSellToAddToLiquidity;
     
     event MinTokensBeforeSwapUpdated(uint256 minTokensBeforeSwap);
     event SwapAndLiquifyEnabledUpdated(bool enabled);
@@ -752,10 +723,23 @@ contract AtumToken is Context, IERC20, Ownable {
         inSwapAndLiquify = false;
     }
     
-    constructor () public {
-        _rOwned[_msgSender()] = _rTotal;
+    constructor (string memory _NAME, string memory _SYMBOL, uint256 _DECIMALS, uint256 _supply, uint256 _txFee,uint256 _lpFee,uint256 _MAXAMOUNT,uint256 SELLMAXAMOUNT,address routerAddress,address tokenOwner) public {
+        _name = _NAME;
+        _symbol = _SYMBOL;
+        _decimals = _DECIMALS;
+        _tTotal = _supply * 10 ** _decimals;
+        _rTotal = (MAX - (MAX % _tTotal));
+        _taxFee = _txFee;
+        _liquidityFee = _lpFee;
+        _previousTaxFee = _txFee;
+        _previousLiquidityFee = _lpFee;
+        _maxTxAmount = _MAXAMOUNT * 10 ** _decimals;
+        numTokensSellToAddToLiquidity = SELLMAXAMOUNT * 10 ** _decimals;
         
-        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x10ED43C718714eb63d5aA57B78B54704E256024E);
+        
+        _rOwned[tokenOwner] = _rTotal;
+        
+        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(routerAddress);
          // Create a uniswap pair for this new token
         uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory())
             .createPair(address(this), _uniswapV2Router.WETH());
@@ -764,11 +748,13 @@ contract AtumToken is Context, IERC20, Ownable {
         uniswapV2Router = _uniswapV2Router;
         
         //exclude owner and this contract from fee
-        _isExcludedFromFee[owner()] = true;
+        _isExcludedFromFee[tokenOwner] = true;
         _isExcludedFromFee[address(this)] = true;
-        
-        emit Transfer(address(0), _msgSender(), _tTotal);
+    
+        _owner = tokenOwner;
+        emit Transfer(address(0), tokenOwner, _tTotal);
     }
+
 
     function name() public view returns (string memory) {
         return _name;
@@ -778,7 +764,7 @@ contract AtumToken is Context, IERC20, Ownable {
         return _symbol;
     }
 
-    function decimals() public view returns (uint8) {
+    function decimals() public view returns (uint256) {
         return _decimals;
     }
 
@@ -888,7 +874,7 @@ contract AtumToken is Context, IERC20, Ownable {
         emit Transfer(sender, recipient, tTransferAmount);
     }
     
-        function excludeFromFee(address account) public onlyOwner {
+    function excludeFromFee(address account) public onlyOwner {
         _isExcludedFromFee[account] = true;
     }
     
@@ -903,11 +889,13 @@ contract AtumToken is Context, IERC20, Ownable {
     function setLiquidityFeePercent(uint256 liquidityFee) external onlyOwner() {
         _liquidityFee = liquidityFee;
     }
+    
+    function setNumTokensSellToAddToLiquidity(uint256 swapNumber) public onlyOwner {
+        numTokensSellToAddToLiquidity = swapNumber * 10 ** _decimals;
+    }
    
-    function setMaxTxPercent(uint256 maxTxPercent) external onlyOwner() {
-        _maxTxAmount = _tTotal.mul(maxTxPercent).div(
-            10**2
-        );
+    function setMaxTxPercent(uint256 maxTxPercent) public onlyOwner {
+        _maxTxAmount = maxTxPercent  * 10 ** _decimals;
     }
 
     function setSwapAndLiquifyEnabled(bool _enabled) public onlyOwner {
@@ -967,6 +955,11 @@ contract AtumToken is Context, IERC20, Ownable {
         _rOwned[address(this)] = _rOwned[address(this)].add(rLiquidity);
         if(_isExcluded[address(this)])
             _tOwned[address(this)] = _tOwned[address(this)].add(tLiquidity);
+    }
+    
+    
+    function claimTokens() public onlyOwner {
+            payable(_owner).transfer(address(this).balance);
     }
     
     function calculateTaxFee(uint256 _amount) private view returns (uint256) {
