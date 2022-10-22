@@ -1,7 +1,18 @@
+/**
+   Website: https://atumtoken.com
+   Twitter: https://twitter.com/atumcoin
+   Telegram: https://t.me/atumtoken
+   
+   Info: $ATUM is a hyper deflationary token that will grow more expensive over time.
+
+   #ATUM features:
+   2% of each transaction added to liquidity pool when selling
+   1% of each transaction redistributed to holders
+   10% Supply is burned at start.
+   
+ */
 pragma solidity ^0.6.12;
 // SPDX-License-Identifier: MIT
-// Name: AtumToken
-// Website: https://atumtoken.com
 interface IERC20 {
 
     function totalSupply() external view returns (uint256);
@@ -672,7 +683,7 @@ interface IUniswapV2Router02 is IUniswapV2Router01 {
 }
 
 
-contract Atum is Context, IERC20, Ownable {
+contract AtumToken is Context, IERC20, Ownable {
     using SafeMath for uint256;
     using Address for address;
 
@@ -704,7 +715,7 @@ contract Atum is Context, IERC20, Ownable {
     address public immutable uniswapV2Pair;
     
     bool inSwapAndLiquify;
-    bool public swapAndLiquifyEnabled = true;
+    bool public swapAndLiquifyEnabled = false;
     
     uint256 public _maxTxAmount;
     uint256 public numTokensSellToAddToLiquidity;
