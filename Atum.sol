@@ -1,20 +1,36 @@
 /**
-   Website: https://atumtoken.com
-   Twitter: https://twitter.com/atumcoin
-   Telegram: https://t.me/atumtoken
+   $ATUM, A Decentralized Token.
    
-   Info: $ATUM is a hyper deflationary token that will grow more expensive over time.
+   THE ATUM ECOSYSTEM:
+   ATUM is a decentralized token built on Binance smart chain with 5 second block speeds that has evolved into an ecosystem. 
+   Our ecosystem ATUM, which is interconnected with the Metaverse, includes a variety of dApps. 
+   In the ATUM ecosystem, you may take advantage of the entire Metaverse experience in addition to playing games or use simple dApps 
+   such as Swap,Market. Our goal is to transform the current web3. 
+   By fusing the metaverse with blockchain, ATUM provides a wholly decentralized environment that gives players and creators 
+   direct ownership of their Tokens, NFT or in-game products in a totally open and impenetrable ecosystem. 
+   Users of ATUM enjoy a totally safe and unrestricted immersive experience.
 
-   #ATUM features:
-   2% of each transaction added to liquidity pool when selling
+   REWARDS IN YOUR WALLET:
+   By just keeping Atum Token in your wallet, all ATUM holders will earn extra ATUM, which will be instantly distributed to your wallet. 
+   As atum token holders automatically get a 1% fee from every transaction made on the Atum Ecosystem, the number of Atum Token in 
+   your wallet will rise. The fees earned by each transaction produce more atum tokens for the community.
+
+   FEATURES:
+   Safe AND secure
+   Accelerates the development and adoption of the ecosystem
+   2% transaction fees allocated to the Liquidity pool
    1% of each transaction redistributed to holders
-   10% Supply is burned at start.
+   Faster then shibainu,ethereum and bitcoin with 5 second block speeds
+   No contract owner
+
+   Website: https://atumtoken.com
+   Email: office@atumtoken.com
    
  */
 pragma solidity ^0.6.12;
 // SPDX-License-Identifier: MIT
 interface IERC20 {
-
+    
     function totalSupply() external view returns (uint256);
 
     /**
@@ -683,7 +699,7 @@ interface IUniswapV2Router02 is IUniswapV2Router01 {
 }
 
 
-contract AtumToken is Context, IERC20, Ownable {
+contract Atum is Context, IERC20, Ownable {
     using SafeMath for uint256;
     using Address for address;
 
